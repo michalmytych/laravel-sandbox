@@ -3,40 +3,42 @@
 namespace App\Http\Controllers\Chat;
 
 use App\Models\Chat\Chat;
-use App\Http\Controllers\Controller;
+use Illuminate\View\View;
 use App\Services\Chat\ChatService;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\Chat\CreateRequest;
 
 class ChatController extends Controller
 {
     public function __construct(private ChatService $chatService) {}
 
-    public function index()
+    public function index(): View
     {
-        $chats = Chat::all();
+        $chats = $this->chatService->all();
 
         return view('chat.index', ['chats' => $chats]);
     }
 
-    public function create(Request $request)
+    public function create(CreateRequest $request): RedirectResponse
     {
-        $this->chatService->create($request->all());
+        $this->chatService->create($request->validated());
 
         return redirect()->to(route('chat.enter'));
     }
 
-    public function enter(Chat $chat)
+    /** @noinspection PhpParamsInspection */
+    public function enter(Chat $chat): View
     {
-        $user = auth()->user();
-
-        $this->chatService->to($chat)->joinChat($user);
+        $this->chatService->to($chat)->joinChat(auth()->user());
 
         return view('chat.enter', [
             'chat' => $chat->load('messages')
         ]);
     }
 
-    public function quit(Chat $chat)
+    /** @noinspection PhpParamsInspection */
+    public function quit(Chat $chat): RedirectResponse
     {
         $user = auth()->user();
 

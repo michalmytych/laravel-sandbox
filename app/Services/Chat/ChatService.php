@@ -5,6 +5,7 @@ namespace App\Services\Chat;
 use App\Models\Chat\Chat;
 use App\Models\Chat\Message\Message;
 use App\Jobs\Chat\Message\SaveMessage;
+use Illuminate\Database\Eloquent\Collection;
 use App\Exceptions\Chat\ReceiverNotSpecifiedException;
 use App\Models\User;
 use App\Events\Chat\ChatCreated;
@@ -15,6 +16,11 @@ use App\Events\Chat\UserQuit;
 class ChatService
 {
     private ?Chat $receiver = null;
+
+    public function all(): Collection
+    {
+        return Chat::latest()->get();
+    }
 
     public function to($receiver): self
     {
@@ -31,6 +37,8 @@ class ChatService
         ]);
 
         ChatCreated::dispatch($chat);
+
+        return $chat;
     }
 
     public function joinChat(User $user)

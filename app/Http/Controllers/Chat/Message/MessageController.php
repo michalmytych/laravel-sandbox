@@ -3,32 +3,18 @@
 namespace App\Http\Controllers\Chat\Message;
 
 use App\Models\Chat\Chat;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Chat\Message\Message;
-use App\Services\Chat\ChatService;
+use Illuminate\Http\RedirectResponse;
+use App\Services\Chat\Message\MessageService;
+use App\Http\Requests\Chat\Message\SendRequest;
 
 class MessageController extends Controller
 {
-    public function __construct(private ChatService $chatService) {}
+    public function __construct(private MessageService $messageService) {}
 
-    public function findByChat(Chat $chat)
+    public function send(SendRequest $request, Chat $chat): RedirectResponse
     {
-        return Message::whereBelongsTo($chat)->get();
-    }
-
-    public function send(Request $request, Chat $chat)
-    {
-        $message = $chat->messages()->make([
-            'content' => $request->input('content'),
-            'user_id' => auth()->id(),
-            'chat_id' => $chat->id
-        ]);
-
-        $this
-            ->chatService
-            ->to($chat)
-            ->send($message);
+        $this->messageService->send($request->validated(), $chat);
 
         return redirect()->to(route('chat.enter', $chat));
     }

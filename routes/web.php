@@ -1,8 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Chat\ChatController;
 use App\Http\Controllers\Chat\Message\MessageController;
-use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,10 +21,17 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+})
+    ->middleware(['auth'])
+    ->name('dashboard');
 
-Route::get('/chats', [ChatController::class, 'index'])->middleware(['auth'])->name('chat.index');
-Route::get('/chats/{chat}/enter', [ChatController::class, 'enter'])->middleware(['auth'])->name('chat.enter');
-Route::post('/chats/{chat}/messages/send', [MessageController::class, 'send'])->middleware(['auth'])->name('chat.message.send');
+Route::prefix('chats')->as('chat.')->middleware(['auth'])->group(function() {
+    Route::prefix('messages')->as('message.')->group(function() {
+        Route::post('{chat}/messages/send', [MessageController::class, 'send'])->name('send');
+    });
+
+    Route::get('/', [ChatController::class, 'index'])->name('index');
+    Route::get('{chat}/enter', [ChatController::class, 'enter'])->name('enter');
+});
 
 require __DIR__.'/auth.php';
