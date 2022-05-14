@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Chat\ChatController;
+use App\Http\Controllers\Chat\Message\MessageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +18,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
+
+Route::get('/chats', [ChatController::class, 'index'])->middleware(['auth'])->name('chat.index');
+Route::get('/chats/{chat}/enter', [ChatController::class, 'enter'])->middleware(['auth'])->name('chat.enter');
+Route::post('/chats/{chat}/messages/send', [MessageController::class, 'send'])->middleware(['auth'])->name('chat.message.send');
+
+require __DIR__.'/auth.php';
