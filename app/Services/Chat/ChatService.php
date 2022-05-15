@@ -2,16 +2,15 @@
 
 namespace App\Services\Chat;
 
+use App\Models\User;
 use App\Models\Chat\Chat;
+use App\Events\Chat\UserQuit;
+use App\Events\Chat\UserJoined;
+use App\Events\Chat\ChatCreated;
 use App\Models\Chat\Message\Message;
-use App\Jobs\Chat\Message\SaveMessage;
+use App\Events\Chat\Message\MessageSent;
 use Illuminate\Database\Eloquent\Collection;
 use App\Exceptions\Chat\ReceiverNotSpecifiedException;
-use App\Models\User;
-use App\Events\Chat\ChatCreated;
-use App\Events\Chat\Message\MessageSent;
-use App\Events\Chat\UserJoined;
-use App\Events\Chat\UserQuit;
 
 class ChatService
 {
@@ -29,7 +28,7 @@ class ChatService
         return $this;
     }
 
-    public function create(array $data)
+    public function create(array $data): Chat
     {
         $chat = Chat::create([
             'user_id' => auth()->id(),
@@ -41,7 +40,7 @@ class ChatService
         return $chat;
     }
 
-    public function joinChat(User $user)
+    public function joinChat(User $user): void
     {
         $this->checkReceiver();
 
@@ -50,7 +49,7 @@ class ChatService
         UserJoined::dispatch($this->receiver, $user);
     }
 
-    public function quitChat(User $user)
+    public function quitChat(User $user): void
     {
         $this->checkReceiver();
 
@@ -59,16 +58,17 @@ class ChatService
         UserQuit::dispatch($this->receiver, $user);
     }
 
-    public function send(Message $message)
+    public function send(Message $message): void
     {
         $this->checkReceiver();
-
-        // SaveMessage::dispatch($this->receiver, $message);
 
         event(new MessageSent($message, $this->receiver));
     }
 
-    public function checkReceiver()
+    /**
+     * @throws ReceiverNotSpecifiedException
+     */
+    public function checkReceiver(): void
     {
         if (!$this->receiver) {
             throw new ReceiverNotSpecifiedException();
