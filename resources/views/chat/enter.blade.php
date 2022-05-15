@@ -27,20 +27,43 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                {{ Form::open([
-                    'url' => route('chat.message.send', $chat) ,
-                    'class' => 'p-2 bg-white border-b border-gray-200'
-                ]) }}
-                    {{ Form::text('content', null, [
-                        'class' => 'bg-gray border-b border-gray-400 sm:rounded-lg'
-                    ]); }}
-                {{ Form::close() }}
+                <form
+                        autocomplete="off"
+                        id="chat-message-form"
+                        class="p-2 bg-white border-b border-gray-200"
+                >
+                    @csrf
+                    <label for="content"></label>
+                    <input
+                            required
+                            id="content"
+                            name="content"
+                            type="text"
+                            placeholder="Napisz wiadomość..."
+                            class="border-b border-gray-400 sm:rounded-lg w-full bg-slate-400"
+                    />
+                </form>
             </div>
         </div>
     </div>
 @endsection
 
 @section('body-bottom-scripts')
+    <script>
+        // Sending form code - can be reused
+        document
+            .querySelector('#chat-message-form')
+            .addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                fetch("{{ route('chat.message.send', $chat) }}", {
+                    method: 'POST',
+                    body: new FormData(e.target)
+                });
+
+                e.target.reset()
+            });
+    </script>
     <script>
         // UI Updates
 
@@ -64,7 +87,7 @@
         function fade(element, delay = 10) {
             let op = 1;
             let timer = setInterval(function () {
-                if (op <= 0.1){
+                if (op <= 0.1) {
                     clearInterval(timer);
                     element.style.display = 'none';
                 }
@@ -101,10 +124,11 @@
 
         Pusher.logToConsole = {{ config('app.debug') }};
 
-        let pusher = new Pusher('d1bdabed3a3f56fe70ec', { cluster: 'eu' });
+        let pusher = new Pusher('d1bdabed3a3f56fe70ec', {cluster: 'eu'});
         let channel = pusher.subscribe('chat-{{ $chat->id }}');
 
-        channel.bind('pusher:subscription_succeeded', (members) => {});
+        channel.bind('pusher:subscription_succeeded', (members) => {
+        });
 
         channel.bind('chat-message', (data) => displayMessage(data.message));
 

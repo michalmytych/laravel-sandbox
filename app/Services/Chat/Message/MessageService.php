@@ -22,5 +22,7 @@ class MessageService
             ->chatService
             ->to($chat)
             ->send($message);
+
+        $message->save();
     }
 }

@@ -24,11 +24,11 @@ class MessageSent implements ShouldBroadcast
         $this->chatId = $chat->id;
 
         $this->message = [
-            'message' => $message->content,
-            'author' => $message->author->name,
-            'chat' => $chat->name,
-            'channel' => 'chat-' . $this->chatId,
-            'created_at' => $message->created_at
+            'message'    => $message->content,
+            'author'     => $message->author->name,
+            'chat'       => $chat->name,
+            'channel'    => 'chat-' . $this->chatId,
+            'created_at' => now(),
         ];
 
         Log::channel('daily')->info('Message sent, id: ' . $message->id);

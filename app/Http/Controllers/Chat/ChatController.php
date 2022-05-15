@@ -11,7 +11,7 @@ use App\Http\Requests\Chat\CreateRequest;
 
 class ChatController extends Controller
 {
-    public function __construct(private ChatService $chatService) {}
+    public function __construct(private ChatService $chatService) { }
 
     public function index(): View
     {
@@ -33,7 +33,9 @@ class ChatController extends Controller
         $this->chatService->to($chat)->joinChat(auth()->user());
 
         return view('chat.enter', [
-            'chat' => $chat->load('messages')
+            'chat' => $chat->with(
+                ['messages' => fn($builder) => $builder->latest()]
+            )->get()->first(),
         ]);
     }
 
