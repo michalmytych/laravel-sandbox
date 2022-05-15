@@ -49,10 +49,10 @@
         const alertContentBox = document.getElementById("alertContentBox")
 
         function unfade(element, delay = 10) {
-            var op = 0.1;
+            let op = 0.1;
             element.style.display = 'block';
-            var timer = setInterval(function () {
-                if (op >= 1){
+            const timer = setInterval(function () {
+                if (op >= 1) {
                     clearInterval(timer);
                 }
                 element.style.opacity = op;
@@ -62,8 +62,8 @@
         }
 
         function fade(element, delay = 10) {
-            var op = 1;
-            var timer = setInterval(function () {
+            let op = 1;
+            let timer = setInterval(function () {
                 if (op <= 0.1){
                     clearInterval(timer);
                     element.style.display = 'none';
@@ -71,7 +71,7 @@
                 element.style.opacity = op;
                 element.style.filter = 'alpha(opacity=' + op * 100 + ")";
                 op -= op * 0.1;
-            }, 30);
+            }, delay);
         }
 
         function getMessageHTML(msg) {
@@ -82,6 +82,7 @@
         }
 
         function displayMessage(msg) {
+            console.log(msg)
             const messageElement = getMessageHTML(msg)
             messagesContainer.prepend(messageElement)
         }
@@ -100,12 +101,12 @@
 
         Pusher.logToConsole = {{ config('app.debug') }};
 
-        var pusher = new Pusher('d1bdabed3a3f56fe70ec', { cluster: 'eu' });
-        var channel = pusher.subscribe('chat-{{ $chat->id }}');
+        let pusher = new Pusher('d1bdabed3a3f56fe70ec', { cluster: 'eu' });
+        let channel = pusher.subscribe('chat-{{ $chat->id }}');
 
         channel.bind('pusher:subscription_succeeded', (members) => {});
 
-        channel.bind('<chatx></chatx>-message', (data) => displayMessage(data.message));
+        channel.bind('chat-message', (data) => displayMessage(data.message));
 
         channel.bind('chat-user-joined', (data) => displayAlert(`Dołączył ${data.message.user}!`));
     </script>

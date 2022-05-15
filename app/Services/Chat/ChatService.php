@@ -9,11 +9,17 @@ use App\Events\Chat\UserJoined;
 use App\Events\Chat\ChatCreated;
 use App\Models\Chat\Message\Message;
 use App\Events\Chat\Message\MessageSent;
+use Illuminate\Database\Eloquent\Collection;
 use App\Exceptions\Chat\ReceiverNotSpecifiedException;
 
 class ChatService
 {
     private ?Chat $receiver = null;
+
+    public function all(): Collection
+    {
+        return Chat::latest()->get();
+    }
 
     public function to($receiver): self
     {
@@ -22,7 +28,7 @@ class ChatService
         return $this;
     }
 
-    public function create(array $data): void
+    public function create(array $data): Chat
     {
         $chat = Chat::create([
             'user_id' => auth()->id(),
@@ -30,6 +36,8 @@ class ChatService
         ]);
 
         ChatCreated::dispatch($chat);
+
+        return $chat;
     }
 
     public function joinChat(User $user): void

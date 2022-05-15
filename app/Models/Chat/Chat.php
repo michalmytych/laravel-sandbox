@@ -13,6 +13,10 @@ class Chat extends Model
 {
     use HasFactory, HasMessages;
 
+    protected $fillable = [
+        'name'
+    ];
+
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
