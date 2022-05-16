@@ -3,10 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\Chat\Chat;
+use App\Models\Cache\Location;
 use App\Models\Chat\Message\Message;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Throwable;
 
 class DatabaseSeeder extends Seeder
 {
@@ -23,5 +23,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Message::factory(3)->create();
+
+        Location::factory(300)->create();
     }
 }

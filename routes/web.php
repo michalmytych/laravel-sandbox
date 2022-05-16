@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Chat\ChatController;
+use App\Http\Controllers\Cache\CacheController;
 use App\Http\Controllers\Chat\Message\MessageController;
 
 /*
@@ -32,6 +33,10 @@ Route::prefix('chats')->as('chat.')->middleware(['auth'])->group(function() {
 
     Route::get('/', [ChatController::class, 'index'])->name('index');
     Route::get('{chat}/enter', [ChatController::class, 'enter'])->name('enter');
+});
+
+Route::prefix('caches')->as('cache.')->middleware(['auth'])->group(function() {
+    Route::get('/', [CacheController::class, 'all'])->name('all');
 });
 
 require __DIR__.'/auth.php';
